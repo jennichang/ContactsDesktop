@@ -22,6 +22,7 @@ import java.util.Scanner;
 
 public class Controller implements Initializable {
     ObservableList<Contact> contacts = FXCollections.observableArrayList();
+    //observablelist is like an array but it will automatically update the ListView when it is updated
 
     @FXML
     ListView list;
@@ -38,24 +39,29 @@ public class Controller implements Initializable {
     public void addItem() throws IOException {
         if(!nameText.getText().equals("") && !phoneText.getText().equals("") && !emailText.getText().equals("")) {
             contacts.add(new Contact(nameText.getText(), phoneText.getText(), emailText.getText()));
-            nameText.setText("");
+            nameText.setText(""); // setText will return the text back to blank after adding. if i didn't have setText
+            // then the text field would continue to show the last text you entered.
             phoneText.setText("");
             emailText.setText("");
-            saveData(contacts); // need to figure out why brackets are empty
+            saveData(contacts); // name, phone, email - if any are empty then do nothing, else add a new contact
+            //object using the get text method
+
         }
 
     }
 
-    public void removeItem() {
-        Contact contactRemove = (Contact) list.getSelectionModel().getSelectedItem();
+    public void removeItem() throws IOException{
+        Contact contactRemove = (Contact) list.getSelectionModel().getSelectedItem(); // getselectionmodel = tracks selection
         contacts.remove(contactRemove);
+        saveData(contacts); // need to figure out why brackets are empty
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        list.setItems(contacts); // performing method call.  method is called set items
-        //and observable array list of items is what is passing into the method
-        //ties our data to our control
+
+        list.setItems(contacts); // initialize will run right when the app starts
+
+        //populate the list before set items
 
     }
 
@@ -68,17 +74,19 @@ public class Controller implements Initializable {
         FileWriter fw = new FileWriter(f);
         fw.write(json);
         fw.close();
+        // NOTE: in order to save json data you need to have getters and setters on your fields or you will have
+        // empty brackets in your json file.
     }
 
-    public static void loadData() throws FileNotFoundException {
+    public static Contact loadData(ObservableList<Contact> contact) throws FileNotFoundException {
         File f = new File("contact.json");
         Scanner s = new Scanner(f);
         s.useDelimiter("\\Z");
         String contents = s.next();
 
         JsonParser p = new JsonParser();
-        Contact m = p.parse(contents, Contact.class);
-        System.out.println(m); // now how do i override toString
+        return p.parse(contents, Contact.class);
+
     }
 
 
