@@ -15,12 +15,38 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.*;
 
 public class Controller implements Initializable {
+
+    public Controller() throws FileNotFoundException {
+    }
+
+    // Method to save json file
+    public void saveData(ObservableList<Contact> contact) throws IOException {
+        JsonSerializer s = new JsonSerializer();
+        String json = s.include("*").serialize(contact);
+
+        File f = new File("contact.json");
+        FileWriter fw = new FileWriter(f);
+        fw.write(json);
+        fw.close();
+        // NOTE: in order to save json data you need to have getters and setters on your fields or you will have
+        // empty brackets in your json file.
+    }
+
+    //TODO: figure out how to load json file in initialize method
+
+//    public void loadData() throws FileNotFoundException{
+//        File f = new File("contact.json");
+//        Scanner s = new Scanner(f);
+//        s.useDelimiter("\\Z");
+//        String contents = s.next();
+//
+//        JsonParser p = new JsonParser();
+//        Contact m = p.parse(contents, Contact.class);
+//    }
+
     ObservableList<Contact> contacts = FXCollections.observableArrayList();
     //observablelist is like an array but it will automatically update the ListView when it is updated
 
@@ -53,41 +79,16 @@ public class Controller implements Initializable {
     public void removeItem() throws IOException{
         Contact contactRemove = (Contact) list.getSelectionModel().getSelectedItem(); // getselectionmodel = tracks selection
         contacts.remove(contactRemove);
-        saveData(contacts); // need to figure out why brackets are empty
+        saveData(contacts);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        list.setItems(contacts); // initialize will run right when the app starts
-
-        //populate the list before set items
+        list.setItems(contacts);
 
     }
 
-    // Method to save json file
-    public void saveData(ObservableList<Contact> contact) throws IOException {
-        JsonSerializer s = new JsonSerializer();
-        String json = s.include("*").serialize(contact);
 
-        File f = new File("contact.json");
-        FileWriter fw = new FileWriter(f);
-        fw.write(json);
-        fw.close();
-        // NOTE: in order to save json data you need to have getters and setters on your fields or you will have
-        // empty brackets in your json file.
-    }
-
-    public static Contact loadData(ObservableList<Contact> contact) throws FileNotFoundException {
-        File f = new File("contact.json");
-        Scanner s = new Scanner(f);
-        s.useDelimiter("\\Z");
-        String contents = s.next();
-
-        JsonParser p = new JsonParser();
-        return p.parse(contents, Contact.class);
-
-    }
 
 
 }
